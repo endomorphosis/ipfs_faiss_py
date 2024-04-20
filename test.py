@@ -1,6 +1,15 @@
+import datasets
+from datasets import load_dataset
+from datasets import FaissIndex
+from transformers import AutoModel
+from ipfs_transformers import AutoModel
+from datasets import load_dataset
+from ipfs_datasets import ipfs_load_dataset
+from ipfs_datasets import auto_download_dataset
+from ipfs_faiss import IpfsFaissDataset
 from datasets import *
 from ipfs_faiss import *
-from ipfs_faiss import ipfs_faiss_dataset
+from ipfs_faiss import IpfsFaissDataset
 import ipfs_datasets
 import ipfs_faiss
 import datasets
@@ -60,7 +69,7 @@ def test():
 
     folderPins = filterFolderPins(all_pins)
     filePins = filterFilePins(all_pins)
-    query = ipfs_faiss_dataset("Caselaw_Access_Project_FAISS_index",folderPins, filePins)
+    query = IpfsFaissDataset("Caselaw_Access_Project_FAISS_index",folderPins, filePins)
     
     return folderPins, filePins
 
