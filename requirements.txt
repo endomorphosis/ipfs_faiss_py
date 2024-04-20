@@ -1,0 +1,2 @@
+datasets
+ipfs_datasets@git+https://github.com/endomorphosis/ipfs_datasets.git
