@@ -7,7 +7,7 @@ https://github.com/endomorphosis/ipfs_datasets
 for huggingface transformers python library visit:
 https://github.com/endomorphosis/ipfs_transformers
 
-for transformers.js visit:
+for transformers.js visit:                          
 https://github.com/endomorphosis/ipfs_transformers_js
 
 for orbitdbkit nodejs library visit:
