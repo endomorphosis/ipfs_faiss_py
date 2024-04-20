@@ -17,7 +17,6 @@ import json
 import os
 
 def ingest_pins(filepath):
-    pinlist = []
     thisdir = os.getcwd()
     filepath = os.path.join(thisdir, filepath)
     filepath = os.path.normpath(filepath)
@@ -27,7 +26,7 @@ def ingest_pins(filepath):
         if filepath.endswith('.json'):
             with open(filepath) as f:
                 data = json.load(f)
-                pinlist.append(data)
+                yield data
         return
     elif is_dir == True:
         files_in_folder = os.listdir(filepath)
@@ -35,36 +34,66 @@ def ingest_pins(filepath):
             if file.endswith('.json'):
                 with open(os.path.join(filepath , file)) as f:
                     data = json.load(f)
-                    pinlist.append(data)
+                    yield data
     else:
         print('Filepath is not a file or directory')
         print('Filepath: ' + filepath)
         return
 
-    return pinlist
-
 def filterFolderPins(pins):
-    return [pin for pin in pins if pin['path'].endswith("json") != True]
+    if type(pins) == dict:
+        if pins['path'].endswith("json"):
+            yield pins
+    elif type(pins) == list:
+        for pin in pins:
+            if not pin['path'].endswith("json"):
+                yield pin
+    elif type(pins) == object:
+        print('Object')
+        print(dir(pins))
 
 def filterFilePins(pins):
-    return [pin for pin in pins if pin['path'].endswith("json") == True]
+    if type(pins) == dict:
+        if pins['path'].endswith("json"):
+            yield pins
+    elif type(pins) == list:
+        for pin in pins:
+            if pin['path'].endswith("json"):
+                yield pin
+    elif type(pins) == object:
+        print('Object')
+        print(dir(pins))
+
 
 def test():
     pin_chunks = ingest_pins('./ipfs_pins/')
+    folder_pins = filterFolderPins(pin_chunks)
+    file_pins = filterFilePins(pin_chunks)
     all_pins = []
-    for pin_list in pin_chunks:
-        all_pins.extend(pin_list)
+    allpins = list(pin_chunks)
+    folder_pins = list(folder_pins)
+    file_pins = list(file_pins)
+    print("File Pins")
+    print(len(file_pins))
+    print("Folder Pins")
+    print(len(folder_pins))
 
-    for pin in all_pins:
-        len_pin = len(pin.keys())
-        if len_pin > 3:
-            print(pin)
-        if len_pin < 3:
-            print(pin)
-            del pin
-
-    folderPins = filterFolderPins(all_pins)
-    filePins = filterFilePins(all_pins)
+    # folder_pins = []
+    # file_pins = []
+    # for pin_list in ingest_pins('./ipfs_pins/'):
+    #     for pin in pin_list:
+    #         len_pin = len(pin.keys())
+    #         if len_pin > 3:
+    #             print(pin)
+    #         elif len_pin < 3:
+    #             print(pin)
+    #             del pin
+    #         else:
+    #             all_pins.append(pin)
+    #             folder_pins.append(filterFolderPins(pin))
+    #             file_pins.append(filterFilePins(pin))
+    # folderPins = filterFolderPins(all_pins)
+    # filePins = filterFilePins(all_pins)
     faiss_dataset = datasets.load_dataset('/teraflopai/Caselaw_Access_Project_FAISS_index/')
     embeddings = datasets.load_dataset('/teraflopai/Caselaw_Access_Project_embeddings/')
     faiss_index = faiss_dataset.load_faiss_index('embeddings', 'my_index.faiss')
