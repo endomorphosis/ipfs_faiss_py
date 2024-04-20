@@ -1,17 +1,27 @@
-# Scaling Ethereum Hackathon
-IPFS Huggingface Bridge
+# Scaling Ethereum Hackathon Presents
+IPFS Huggingface Bridge:
 
-for huggingface datasets python library visit
-https://github.com/endomorphosis/ipfs_datases
+for huggingface datasets python library visit:
+https://github.com/endomorphosis/ipfs_datasets
 
-for huggingface transformers python library visit
+for huggingface transformers python library visit:
 https://github.com/endomorphosis/ipfs_transformers
 
 for transformers.js visit:
 https://github.com/endomorphosis/ipfs_transformers_js
 
-for orbitdbkit nodejs library visit
+for orbitdbkit nodejs library visit:
 https://github.com/endomorphosis/orbitdb-benchmark/
+
+for python model manager library visit: 
+https://github.com/endomorphosis/ipfs_model_manager/
+
+for nodejs model manager library visit: 
+https://github.com/endomorphosis/ipfs_model_manager_js/
+
+for nodejs ipfs huggingface scraper with pinning services visit:
+https://github.com/endomorphosis/ipfs_huggingface_scraper/
+
 
 Author - Benjamin Barber
 QA - Kevin De Haan
@@ -111,33 +121,3 @@ query_vector = model.encode(query)
 scores, neighbors = index.search(query_vectors, k=10)
 
 ~~~
-
-# To scrape huggingface
-
-with interactive prompt:
-
-~~~shell
-node scraper.js [source] [model name]
-~~~
-
-~~~shell
-node scraper.js 
-~~~
-
-import a model already defined:
-
-~~~shell
-node scraper.js hf "datasetname" (as defined in your .json files)
-~~~
-
-import all models previously defined:
-
-~~~shell
-node scraper.js hf 
-~~~
-
-## TODO integrate orbitDB
-
-## TODO integrate ipfs_knn_kit
-
-## TODO integrate bacalhau dockerfile
