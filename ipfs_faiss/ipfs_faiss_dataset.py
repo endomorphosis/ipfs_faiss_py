@@ -117,8 +117,9 @@ class IpfsFaissDataset():
     def query_faiss(self, query_vector, k, index):
         return index.search(query_vector, k)
 
-    def join_ipfs_faiss(self, folder_pins, file_pins):
-        return folder_pins + file_pins    
+    def join_ipfs_faiss(self, dataset, folder_pins, file_pins):
+        merged_dataset = datasets.Dataset()
+        return merged_dataset    
 
     def test():
         return "test"
