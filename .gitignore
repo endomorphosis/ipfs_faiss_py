@@ -5,4 +5,4 @@ package-lock.json
 **/node_modules
 **/package-lock.json
 **/ipfs_faiss.egg-info
-**/build/
+**/build

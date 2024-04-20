@@ -1,5 +1,5 @@
 {
-	"name": "@ipfs_faiss",
+	"name": "ipfs_faiss",
 	"version": "1.0.0",
 	"type": "module",
 	"bin": {
