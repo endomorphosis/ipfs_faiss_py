@@ -1,17 +1,13 @@
 import datasets
 from datasets import load_dataset
-from datasets import FaissIndex
-from transformers import AutoModel
-from ipfs_transformers import AutoModel
-from datasets import load_dataset
-from ipfs_datasets import ipfs_load_dataset
-from ipfs_datasets import auto_download_dataset
+# from transformers import AutoModel
+# from ipfs_transformers import AutoModel
+# from ipfs_datasets import ipfs_load_dataset
+# from ipfs_datasets import auto_download_dataset
 from ipfs_faiss import IpfsFaissDataset
 from datasets import *
 from ipfs_faiss import *
 from ipfs_faiss import IpfsFaissDataset
-import ipfs_datasets
-import ipfs_faiss
 import datasets
 import urllib3
 import requests
@@ -69,8 +65,23 @@ def test():
 
     folderPins = filterFolderPins(all_pins)
     filePins = filterFilePins(all_pins)
-    query = IpfsFaissDataset("Caselaw_Access_Project_FAISS_index",folderPins, filePins)
+    faiss_dataset = datasets.load_dataset('/teraflopai/Caselaw_Access_Project_FAISS_index/')
+    embeddings = datasets.load_dataset('/teraflopai/Caselaw_Access_Project_embeddings/')
+    faiss_index = faiss_dataset.load_faiss_index('embeddings', 'my_index.faiss')
+    #dataset = ipfs_faiss_dataset.auto_download('Caselaw_Access_Project_FAISS_index')
+    merged_dataset = ipfs_faiss_dataset.join_ipfs_faiss(faiss_dataset, folderPins, filePins)
+    embeddings = merged_dataset['embeddings']
+
+
     
+    # model = AutoModel.from_auto_download("bge-small-en-v1.5")
+    # dataset = auto_download_dataset('Caselaw_Access_Project_JSON')
+    # knnindex = auto_download_faiss_index('Caselaw_Access_Project_FAISS_index')
+    # index = FaissIndex(dimension=512)
+    # embeddings = dataset['embeddings']
+    # query = "What is the capital of France?"
+    # query_vector = model.encode(query)
+    # scores, neighbors = index.search(query_vectors, k=10)
     return folderPins, filePins
 
 if __name__ == '__main__':
