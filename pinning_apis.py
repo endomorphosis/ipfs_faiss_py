@@ -122,7 +122,14 @@ class PinningApis():
         return False
 
     def web3storage_push(self, pin, **kwargs):
-        results = self.web3storage.web3storage_push(pin)
+        if "path" in kwargs:
+            path = kwargs["path"]
+        else:
+            path = None
+        results = self.web3storage.web3storage_push(
+            pin,
+            path=path
+        )
         return results
     
     def pinata_push(self, pin, **kwargs):
@@ -265,12 +272,22 @@ class PinningApis():
         else:
             file_pins = None
                     
-        if "path"in kwargs:
+        if "path" in kwargs:
             path = kwargs["path"]
         elif "path" in pin:
             path = pin['path']
         else:    
             path = None
+
+        if "local_path" in kwargs:
+            local_path = kwargs["local_path"]
+        elif "local_path" in pin:
+            local_path = pin['local_path']
+        elif "local_path" in self.config.baseConfig:
+            local_path = self.config.baseConfig["local_path"]
+        else:
+            local_path = None
+
         
         pinata_remaining = float(self.pinata_quota) - float(self.pinata_usage)
         web3storage_remaining = float(self.web3storage_quota) - float(self.web3storage_usage)
@@ -283,20 +300,36 @@ class PinningApis():
             else:
                 push_pin_pinata = None
             if web3storage_remaining > 0:
-                push_pin_web3storage = self.web3storage_push(pin, path=path)
+                push_pin_web3storage = self.web3storage_push(
+                    pin,
+                    path=path,
+                    local_path=local_path
+                )
             else:
                 push_pin_web3storage = None
             if lighthouse_remaining > 0:
-                push_pin_lighthouse = self.lighthouse_push(pin, path=path)
+                push_pin_lighthouse = self.lighthouse_push(
+                    pin,
+                    path=path,
+                    local_path=local_path
+                )
             else:
                 push_pin_lighthouse = None
             if filebase_remaining > 0:
-                push_pin_filebase = self.filebase_push(pin, path=path)
+                push_pin_filebase = self.filebase_push(
+                    pin,
+                    path=path,
+                    local_path=local_path
+                )
             else:
                 push_pin_filebase = None
         else:
             if web3storage_remaining > 0:
-                push_pin_web3storage = self.web3storage_push(pin, path=path)
+                push_pin_web3storage = self.web3storage_push(
+                    pin,
+                    path=path,
+                    local_path=local_path
+                )
             else:
                 push_pin_web3storage = None
             push_pin_pinata = None
@@ -310,7 +343,7 @@ class PinningApis():
             "lighthouse": push_pin_lighthouse,
             "filebase": push_pin_filebase,
         }
-        pass
+        return results
 
     def decide_fastest(self, **kwargs):
         if "decide" in kwargs:

@@ -311,8 +311,87 @@ class web3storage():
 
         command = f"""ipfs dag"""      
 
-
     def web3storage_push(self, pin, **kwargs):
+        if "path" in kwargs and kwargs["path"] is not None:
+            path = kwargs["path"]
+        if "local_path" in kwargs and kwargs["local_path"] is not None:
+            local_path = kwargs["local_path"]
+        elif "local_path" in list(dir(self)) and self.local_path is not None:
+            local_path = self.local_path
+        elif "local_path" in self.config.baseConfig["PATHS"] and self.config.baseConfig["PATHS"]["local_path"] is not None:
+            local_path = self.config.baseConfig["PATHS"]["local_path"]
+        if "space" in kwargs and kwargs["space"] is not None:
+            space = kwargs["space"]
+        elif "space" in list(dir(self)) and self.space is not None:
+            space = self.space
+        elif "space" in self.config.baseConfig["WEB3STORAGE"] and self.config.baseConfig["WEB3STORAGE"]["space"] is not None:
+            space = self.config.baseConfig["WEB3STORAGE"]["space"]
+
+        set_space_command = "w3 space use " + space
+        results = subprocess.check_output(set_space_command, shell=True)
+        results = results.decode("utf-8")
+        print(results)
+
+
+        if path.startswith("/"):
+            path = path[1:]
+
+        found = False
+        if found == False:
+            joined_path = os.path.realpath(os.path.join(local_path, path))
+            if joined_path.endswith("json"):
+                if os.path.exists(path) or os.path.exists(joined_path):
+                    if os.path.exists(path):
+                        command = "w3 up " + path
+                    else:
+                        command = "w3 up " + joined_path
+                    try:
+                        results = subprocess.check_output(command, shell=True)
+                        results = results.decode("utf-8")
+                        new_cid = str(results.split("link/ipfs/")[-1])
+                    except Exception as e:
+                        print(e)
+                        print("web3storage_push")
+                        print("Failed to upload")
+                        print("Path: " + str(path))
+                        raise Exception("Failed to upload")
+                    finally:
+                        results_string = str("added") + str("\t") + str(new_cid).replace("\n","") + str("\t") + str(path)
+                        cmd = str("echo '" + results_string + "' >> ./web3storage_pins.tsv")
+                        os.system(cmd)
+                        return new_cid
+
+                    
+        elif found == False:
+                print("web3storage_push")
+                print("Invalid path")
+                print("Path: " + str(path))
+                raise Exception("Invalid path")
+                return False
+    
+
+    def web3storage_push_local(self, pin, **kwargs):
+        path = None
+        if isinstance(pin, dict):
+            if "path" in kwargs:
+                path = kwargs["path"]
+        
+        if path != None:
+            if path.endswith("json"):
+                command = "w3 up" + path
+                results = subprocess.check_output(command, shell=True)
+                print("uploading " + path)
+                print(results)
+                return results
+            else:
+                print("web3storage_push_local")
+                print("Invalid path")
+                print("Path: " + str(path))
+                raise Exception("Invalid path")
+                return False
+
+    def web3storage_push_car(self, pin, **kwargs):
+
         try:
             command = "ipfs dag export " + pin + " > " + pin + ".car"
             results = subprocess.check_output(command, shell=True)
@@ -365,52 +444,6 @@ class web3storage():
         }
 
         return results
-        return False
-        config = self.config
-        auth_key = self.config.baseConfig["WEB3STORAGE"]["auth_key"]
-        https_endpoint = self.config.baseConfig["WEB3STORAGE"]["https_endpoint"]
-        cid = None
-        path = None
-
-        if "pin" in kwargs:
-            cid = kwargs["pin"]
-        elif isinstance(pin, dict) and "hash" in pin:
-            cid = pin["hash"]
-        elif isinstance(pin, str):
-            cid = pin
-
-        if "path" in kwargs:
-            path = kwargs["path"]
-        elif isinstance(pin, dict) and "path" in pin:
-            path = pin["path"]
-        elif isinstance(pin, str):
-            path = pin
-        
-        if cid is not None and path is not None and auth_key is not None:
-            command = f"""curl -X POST '{https_endpoint}' \
-            --header 'Accept: */*' \
-            --header 'Authorization: Bearer {auth_key}' \
-            --header 'Content-Type: application/json' \
-            -d '{{
-            \"cid\": \"{cid}\",
-            \"name\": \"{path}\"
-            }}' """
-
-            response = requests.post(https_endpoint, headers={'Accept': '*/*', 'Authorization': f'Bearer {auth_key}', 'Content-Type': 'application/json'}, json={'cid': cid, 'name': path})
-            command.replace("$(auth_key)", auth_key)
-            command.replace("$(cid)", cid)
-            command.replace("$(path)", path)
-            command.replace("$(ipfs_endpoint)", https_endpoint)
-
-            command_results = subprocess.check_output(command, shell=True)
-            return command_results
-        else:
-            print("Missing required parameters")
-            print("CID: " + str(cid))
-            print("Path: " + str(path))
-            print("Auth Key: " + str(auth_key))
-            raise Exception("Missing required parameters")
-        
 
 
     def web3storage_push_bak(self, pin, **kwargs):

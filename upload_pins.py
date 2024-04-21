@@ -79,7 +79,7 @@ def filterFileByFolderPins(folder_names, pins):
     return folders
 
 
-def test():
+def upload():
     pin_chunks = ingest_pins('./ipfs_pins/')
     folder_pins = filterFolderPins(pin_chunks)
     folder_names = []
@@ -96,7 +96,8 @@ def test():
     meta['config'] = config("./config/config.toml")
     this_pinning_apis = PinningApis(None, meta)
     for pin_list in pin_chunks:
-        for pin in pin_list:
+        this_pin_list = filterFilePins(pin_list)
+        for pin in this_pin_list:
             pin_cid = None
             if "hash" in pin:
                 pin_cid = pin['hash']
@@ -105,9 +106,12 @@ def test():
                 pin_cid = None
                 
             path = pin['path']
+            this_config = meta['config'].baseConfig
+            local_path =  this_config['PATHS']['local_path']
             push_pin_results = this_pinning_apis.pin_push_one_every(
                 pin_cid,
                 path=path,
+                local_path=local_path,
                 file_by_folder_pins=files_by_folder,
                 folder_pins=folder_pins,
                 file_pins=file_pins
@@ -129,4 +133,4 @@ def test():
     return folder_pins, file_pins, allpins
 
 if __name__ == '__main__':
-    test()
+    upload()
