@@ -1,8 +1,8 @@
 from pinning_apis import PinningApis
-from pinata import Pinata
-from web3storage import Web3Storage
-from filebase import Filebase
-from lighthouse import Lighthouse
+from pinata import pinata
+from web3storage import web3storage
+from filebase import filebase
+from lighthouse import lighthouse
 
 import urllib3
 import requests
@@ -59,11 +59,36 @@ def filterFilePins(pins):
         print('Object')
         print(dir(pins))
 
+def filterFileByFolderPins(folder_names, pins):
+    folders = {}
+    for pin in pins:
+        this_path = pin['path']
+        found = False
+        for folder_name in folder_names:
+            if folder_name in this_path:
+                if folder_name not in folders:
+                    folders[folder_name] = []
+                folders[folder_name].append(pin)
+                found = True
+                break
+        if found == False:
+            if 'other' not in folders:
+                folders['other'] = []
+            folders['other'].append(pin)
+    return folders
+
 
 def test():
     pin_chunks = ingest_pins('./ipfs_pins/')
     folder_pins = filterFolderPins(pin_chunks)
+    folder_names = []
+    for folder_pin in folder_pins:
+        this_folder_pin = folder_pin
+        path = this_folder_pin['path']
+        folder_name = path.split('/')[-1]
+        folder_names.append(folder_name)        
     file_pins = filterFilePins(pin_chunks)
+    files_by_folder = filterFileByFolderPins(folder_names, file_pins)
     all_pins = []
     push_results = {}
     this_pinning_apis = PinningApis()
@@ -77,7 +102,13 @@ def test():
                 pin_cid = None
                 
             path = pin['path']
-            push_pin_results = this_pinning_apis.pin_push_one_every(pin_cid, path=path)
+            push_pin_results = this_pinning_apis.pin_push_one_every(
+                pin_cid,
+                path=path,
+                file_by_folder_pins=files_by_folder,
+                folder_pins=folder_pins,
+                file_pins=file_pins
+            )
             print(push_pin_results)
             push_results[pin_cid] = push_pin_results
 
@@ -92,7 +123,7 @@ def test():
     print(len(file_pins))
     print("Folder Pins")
     print(len(folder_pins))
-    return folderPins, filePins
+    return folder_pins, file_pins, allpins
 
 if __name__ == '__main__':
     test()

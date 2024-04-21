@@ -26,6 +26,21 @@ class PinningApis():
         self.filebase = filebase()
         self.pinata = pinata()
 
+        self.pinata_quota = None
+        self.web3storage_quota = None
+        self.lighthouse_quota = None
+        self.filebase_quota = None
+
+        self.pinata_usage = None
+        self.web3storage_usage = None
+        self.lighthouse_usage = None
+        self.filebase_usage = None
+
+        self.pinata_pins = None
+        self.web3storage_pins = None
+        self.lighthouse_pins = None
+        self.filebase_pins = None
+
         if meta is not None:
             if "api_key" in meta:
                 self.api_key = meta["api_key"]
@@ -39,6 +54,51 @@ class PinningApis():
             meta = {}
             self.toml_file = "config.toml"
             self.config = config()
+
+        if "PINATA" in list(self.config.baseConfig.keys()):
+            self.pinata_config = self.config.baseConfig["PINATA"]
+            self.pinata_state = self.pinata.pinata_state()
+        else:
+            self.pinata_config = None
+            self.pinata_state = None
+        if "WEB3STORAGE" in list(self.config.baseConfig.keys()):
+            self.web3storage_config = self.config.baseConfig["WEB3STORAGE"]
+            self.web3storage_state = self.web3storage.web3storage_state()
+        else:
+            self.web3storage_config = None
+            self.web3storage_state = None
+        if "LIGHTHOUSE" in list(self.config.baseConfig.keys()):
+            self.lighthouse_config = self.config.baseConfig["LIGHTHOUSE"]
+            self.lighthouse_state = self.lighthouse.lighthouse_state()
+        else:
+            self.lighthouse_config = None
+            self.lighthouse_state = None
+        if "FILEBASE" in list(self.config.baseConfig.keys()):
+            self.filebase_config = self.config.baseConfig["FILEBASE"]
+            self.filebase_state = self.filebase.filebase_state()
+        else:
+            self.filebase_config = None
+            self.filebase_state = None    
+
+        if self.web3storage_config != None:
+            self.web3storage_quota = self.web3storage_state["quota"]
+            self.web3storage_usage = self.web3storage_state["usage"]
+            self.web3storage_pins = self.web3storage_state["pins"]
+
+        if self.lighthouse_config != None:
+            self.lighthouse_quota = self.lighthouse_state["quota"]
+            self.lighthouse_usage = self.lighthouse_state["usage"]
+            self.lighthouse_pins = self.lighthouse_state["pins"]
+        
+        if self.filebase_config != None:
+            self.filebase_quota = self.filebase_state["quota"]
+            self.filebase_usage = self.filebase_state["usage"]
+            self.filebase_pins = self.filebase_state["pins"]
+
+        if self.pinata_config != None:
+            self.pinata_quota = self.pinata_state["quota"]
+            self.pinata_usage = self.pinata_state["usage"]
+            self.pinata_pins = self.pinata_state["pins"]
 
     def pinata_test(self, **kwargs):
         results = self.pinata.pinata_test()
@@ -134,7 +194,7 @@ class PinningApis():
             return push_pin_pinata
         elif src == "web3storage":
             push_pin_web3storage = self.web3storage_push(pin)
-            return push_pin_web3
+            return push_pin_web3storage
         elif src == "lighthouse":
             push_pin_lighthouse = self.lighthouse_push(pin)
             return push_pin_lighthouse
@@ -184,18 +244,60 @@ class PinningApis():
         else:
             print("No hash provided")
             pin_cid = None
-        
+            
+        if "file_by_folder_pins" in kwargs:
+            folder = kwargs["file_by_folder_pins"]
+        else:
+            folder = None
+
+        if "folder_pins" in kwargs:
+            folders_pins = kwargs["folder_pins"]
+        else:
+            folder_pins = None
+
+        if "file_pins" in kwargs:
+            file_pins = kwargs["file_pins"]
+        else:
+            file_pins = None
+                    
         if "path"in kwargs:
             path = kwargs["path"]
         elif "path" in pin:
             path = pin['path']
         else:    
             path = None
+        
+        pinata_remaining = float(self.pinata_quota) - float(self.pinata_usage)
+        web3storage_remaining = float(self.web3storage_quota) - float(self.web3storage_usage)
+        lighthouse_remaining = float(self.lighthouse_quota) - float(self.lighthouse_usage)
+        filebase_remaining = float(self.filebase_quota) - float(self.filebase_usage)
 
-        push_pin_pinata = self.pinata_push(pin, path=path)
-        push_pin_web3storage = self.web3storage_push(pin, path=path)
-        push_pin_lighthouse = self.lighthouse_push(pin, path=path)
-        push_pin_filebase = self.filebase_push(pin, path=path)
+        if "or" in folder:
+            if pinata_remaining > 0:
+                push_pin_pinata = self.pinata_push(pin, path=path)
+            else:
+                push_pin_pinata = None
+            if web3storage_remaining > 0:
+                push_pin_web3storage = self.web3storage_push(pin, path=path)
+            else:
+                push_pin_web3storage = None
+            if lighthouse_remaining > 0:
+                push_pin_lighthouse = self.lighthouse_push(pin, path=path)
+            else:
+                push_pin_lighthouse = None
+            if filebase_remaining > 0:
+                push_pin_filebase = self.filebase_push(pin, path=path)
+            else:
+                push_pin_filebase = None
+        else:
+            if web3storage_remaining > 0:
+                push_pin_web3storage = self.web3storage_push(pin, path=path)
+            else:
+                push_pin_web3storage = None
+            push_pin_pinata = None
+            push_pin_lighthouse = None
+            push_pin_filebase = None
+            pass
 
         results = {
             "pinata": push_pin_pinata,
