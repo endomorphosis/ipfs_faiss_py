@@ -47,7 +47,18 @@ class web3storage():
 
         self.state = None
 
-    def ready(self):
+    def ready(self, **kwargs):
+        if "space" in kwargs and kwargs["space"] is not None:
+            space = kwargs["space"]
+        elif "space" in list(dir(self)) and self.space is not None:
+            space = self.space
+        elif "space" in self.config.baseConfig["WEB3STORAGE"] and self.config.baseConfig["WEB3STORAGE"]["space"] is not None:
+            space = self.config.baseConfig["WEB3STORAGE"]["space"]
+
+        set_space_command = "w3 space use " + space
+        results = subprocess.check_output(set_space_command, shell=True)
+        results = results.decode("utf-8")
+
         self.w3 = None
         try:
             w3 = subprocess.check_output("which w3", shell=True)
@@ -320,17 +331,6 @@ class web3storage():
             local_path = self.local_path
         elif "local_path" in self.config.baseConfig["PATHS"] and self.config.baseConfig["PATHS"]["local_path"] is not None:
             local_path = self.config.baseConfig["PATHS"]["local_path"]
-        if "space" in kwargs and kwargs["space"] is not None:
-            space = kwargs["space"]
-        elif "space" in list(dir(self)) and self.space is not None:
-            space = self.space
-        elif "space" in self.config.baseConfig["WEB3STORAGE"] and self.config.baseConfig["WEB3STORAGE"]["space"] is not None:
-            space = self.config.baseConfig["WEB3STORAGE"]["space"]
-
-        set_space_command = "w3 space use " + space
-        results = subprocess.check_output(set_space_command, shell=True)
-        results = results.decode("utf-8")
-        print(results)
 
 
         if path.startswith("/"):
