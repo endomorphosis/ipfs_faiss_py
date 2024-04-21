@@ -216,7 +216,14 @@ class PinningApis():
         return results
     
     def test():
+
         return False
     
     def import_pins():
+        
         return False
+    
+if __name__ == "__main__":
+    test_pinset = PinningApis()
+    test_pinset.test()
+    pass

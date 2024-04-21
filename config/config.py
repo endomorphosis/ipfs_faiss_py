@@ -9,13 +9,15 @@ from os.path import isfile, join
 from os import listdir
 import toml
 
-export class 
-
-baseConfig = {
-    'master': {
-        'port': 8080,
-        'tempPath': tempfile.mkdtemp(prefix='cloudkit-', dir=os.tempdir)
-    }
+export class config:
+    def __init__(self, api_key):
+        self.toml_file = "config.toml"
+        self.api_key = api_key
+        self.baseConfig = {
+        'master': {
+            'port': 8080,
+            'tempPath': tempfile.mkdtemp(prefix='cloudkit-', dir=os.tempdir)
+        }
 }
 
 def overrideToml(base, overrides):

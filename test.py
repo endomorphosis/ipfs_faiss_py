@@ -70,6 +70,7 @@ def test():
     folder_pins = filterFolderPins(pin_chunks)
     file_pins = filterFilePins(pin_chunks)
     all_pins = []
+    
     allpins = list(pin_chunks)
     folder_pins = list(folder_pins)
     file_pins = list(file_pins)
