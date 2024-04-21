@@ -3,8 +3,16 @@ import sys
 import json
 import requests
 sys.path.append('./config')
+sys.path.append('./web3storage')
+sys.path.append('./filebase')
+sys.path.append('./lighthouse')
+sys.path.append('./pinata')
 sys.path.append('..')
 from config import config
+from web3storage import web3storage
+from filebase import filebase
+from lighthouse import lighthouse
+from pinata import pinata
 
 class PinningApis():
     def __init__(self, collection=None, meta=None):
@@ -12,6 +20,11 @@ class PinningApis():
         self.config = config()
         self.api_key = None
         self.local_path = None
+
+        self.lighthouse = lighthouse()
+        self.web3storage = web3storage()
+        self.filebase = filebase()
+        self.pinata = pinata()
 
         if meta is not None:
             if "api_key" in meta:
@@ -27,50 +40,58 @@ class PinningApis():
             self.toml_file = "config.toml"
             self.config = config()
 
-    def pinata_test(self):
+    def pinata_test(self, **kwargs):
+        results = self.pinata.pinata_test()
+        return results
+    
+    def web3storage_test(self, **kwargs):
+        results = self.web3storage.web3storage_test()
+        return results
 
-        return False
+    def lighthouse_test(self, **kwargs):
+        results = self.lighthouse.lighthouse_test()
+        return results
     
-    def web3_test(self):
-            
-        return False
-
-    def lighthouse_test(self):
-                
-        return False
-    
-    def filebase_test(self):
-
-        return False
-
-    def web3_push(self, pin):
-        return False
-    
-    def pinata_push(self, pin):
-        return False
-    
-    def lighthouse_push(self, pin):
-        return False
-    
-    def filebase_push(self, pin):
+    def filebase_test(self, **kwargs):
+        results = self.filebase.filebase_test()
         return False
 
-    def web3_pull(self, pin):
+    def web3storage_push(self, pin, **kwargs):
+        results = self.web3storage.web3storage_push(pin)
+        return results
+    
+    def pinata_push(self, pin, **kwargs):
+        results = self.pinata.pinata_push(pin)
+        return results
+    
+    def lighthouse_push(self, pin, **kwargs):
+        results = self.lighthouse.lighthouse_push(pin)
+        return results
+    
+    def filebase_push(self, pin, **kwargs):
+        results = self.filebase.filebase_push(pin)
+        return results
+
+    def web3storage_pull(self, pin, **kwargs):
+        results = self.web3storage.web3storage_pull(pin, **kwargs)
+        return results
+    
+    def pinata_pull(self, pin, **kwargs):
+        results = self.pinata.pinata_pull(pin, **kwargs)
         return False
     
-    def pinata_pull(self, pin):
+    def lighthouse_pull(self, pin, **kwargs):
+        results = self.lighthouse.lighthouse_pull(pin, **kwargs)
         return False
     
-    def lighthouse_pull(self, pin):
-        return False
-    
-    def filebase_pull(self, pin):
+    def filebase_pull(self, pin, **kwargs):
+        results = self.filebase.filebase_pull(pin, **kwargs)
         return False
     
     def ready_status(self, **kwargs):
         results = {
             "pinata": False,
-            "web3": False,
+            "web3storage": False,
             "lighthouse": False,
             "filebase": False,
         }
@@ -79,9 +100,9 @@ class PinningApis():
             pinata_test = self.pinata_test()
             results["pinata"] = pinata_test
 
-        if "web3" in list(self.config.keys()):
-            web3_test = self.web3_test()
-            results["web3"] = web3_test
+        if "web3storage" in list(self.config.keys()):
+            web3storage_test = self.web3storage_test()
+            results["web3storage"] = web3storage_test
         
         if "lighthouse" in list(self.config.keys()):
             lighthouse_test = self.lighthouse_test()
@@ -105,14 +126,14 @@ class PinningApis():
         
         if src == "all":
             push_pin_pinata = self.pinata_push(pin)
-            push_pin_web3 = self.web3_push(pin)
+            push_pin_web3storage = self.web3storage_push(pin)
             push_pin_lighthouse = self.lighthouse_push(pin)
             push_pin_filebase = self.filebase_push(pin)
         elif src == "pinata":
             push_pin_pinata = self.pinata_push(pin)
             return push_pin_pinata
-        elif src == "web3":
-            push_pin_web3 = self.web3_push(pin)
+        elif src == "web3storage":
+            push_pin_web3storage = self.web3storage_push(pin)
             return push_pin_web3
         elif src == "lighthouse":
             push_pin_lighthouse = self.lighthouse_push(pin)
@@ -122,48 +143,63 @@ class PinningApis():
             return push_pin_filebase
         else:
             push_pin_pinata = self.pinata_push(pin)
-            push_pin_web3 = self.web3_push(pin)
+            push_pin_web3storage = self.web3storage_push(pin)
             push_pin_lighthouse = self.lighthouse_push(pin)
             push_pin_filebase = self.filebase_push(pin)
             
         results = {
             "pinata": push_pin_pinata,
-            "web3": push_pin_web3,
+            "web3storage": push_pin_web3storage,
             "lighthouse": push_pin_lighthouse,
             "filebase": push_pin_filebase,
         }
 
         return results
     
-    def pin_push_all_every(self, pins):
+    def pin_push_all_every(self, pins, **kwargs):
         results = {}
         for pin in pins:
             pin_cid = pin['cid']
             push_pin_pinata = self.pinata_push(pin_cid)
-            push_pin_web3 = self.web3_push(pin_cid)
+            push_pin_web3storage = self.web3storage_push(pin_cid)
             push_pin_lighthouse = self.lighthouse_push(pin_cid)
             push_pin_filebase = self.filebase_push(pin_cid)
 
         results = {
             "pinata": push_pin_pinata,
-            "web3": push_pin_web3,
+            "web3storage": push_pin_web3storage,
             "lighthouse": push_pin_lighthouse,
             "filebase": push_pin_filebase,
         }
         pass
 
-    def pin_push_one_every(self, pin):
+    def pin_push_one_every(self, pin, **kwargs):
         results = {}
-        pin_cid = pin['cid']
+        if "hash" in kwargs:
+            pin_cid = kwargs["hash"]
+        elif isinstance(pin, dict) and "hash" in pin:
+            pin_cid = pin['hash']
+        elif isinstance(pin, str):
+            pin_cid = pin
+        else:
+            print("No hash provided")
+            pin_cid = None
+        
+        if "path"in kwargs:
+            path = kwargs["path"]
+        elif "path" in pin:
+            path = pin['path']
+        else:    
+            path = None
 
-        push_pin_pinata = self.pinata_push(pin)
-        push_pin_web3 = self.web3_push(pin)
-        push_pin_lighthouse = self.lighthouse_push(pin)
-        push_pin_filebase = self.filebase_push(pin)
+        push_pin_pinata = self.pinata_push(pin, path=path)
+        push_pin_web3storage = self.web3storage_push(pin, path=path)
+        push_pin_lighthouse = self.lighthouse_push(pin, path=path)
+        push_pin_filebase = self.filebase_push(pin, path=path)
 
         results = {
             "pinata": push_pin_pinata,
-            "web3": push_pin_web3,
+            "web3": push_pin_web3storage,
             "lighthouse": push_pin_lighthouse,
             "filebase": push_pin_filebase,
         }
@@ -181,7 +217,7 @@ class PinningApis():
                 decide = "web3"
         return decide
 
-    def pin_pull_one_every(self, pins):
+    def pin_pull_one_every(self, pins, **kwargs):
         results = {}
         for pin in pins:
             pin_cid = pin['cid']
@@ -190,9 +226,9 @@ class PinningApis():
         if decide == "pinata":
             pull_pin_pinata = self.pinata_pull(pin)
             return pull_pin_pinata
-        elif decide == "web3":
-            pull_pin_web3 = self.web3_pull(pin)
-            return pull_pin_web3
+        elif decide == "web3storage":
+            pull_pin_web3storage = self.web3storage_pull(pin)
+            return pull_pin_web3storage
         elif decide == "lighthouse":
             pull_pin_lighthouse = self.lighthouse_pull(pin)
             return pull_pin_lighthouse
@@ -201,27 +237,27 @@ class PinningApis():
             return pull_pin_filebase
         elif decide == "all":
             pull_pin_pinata = self.pinata_pull(pin)
-            pull_pin_web3 = self.web3_pull(pin)
+            pull_pin_web3storage = self.web3storage_pull(pin)
             pull_pin_lighthouse = self.lighthouse_pull(pin)
             pull_pin_filebase = self.filebase_pull(pin)
         elif decide == None:
             pull_pin_pinata = self.pinata_pull(pin)
-            pull_pin_web3 = self.web3_pull(pin)
+            pull_pin_web3storage = self.web3storage_pull(pin)
             pull_pin_lighthouse = self.lighthouse_pull(pin)
             pull_pin_filebase = self.filebase_pull(pin)
 
-        fastest = sorted([pull_pin_pinata, pull_pin_web3, pull_pin_lighthouse, pull_pin_filebase], key=lambda x: x['time'])
+        fastest = sorted([pull_pin_pinata, pull_pin_web3storage, pull_pin_lighthouse, pull_pin_filebase], key=lambda x: x['time'])
         decide = self.decide_fastest(fastest)
         results = {
             "fastest": fastest,
             "pinata": pull_pin_pinata,
-            "web3": pull_pin_web3,
+            "web3storage": pull_pin_web3storage,
             "lighthouse": pull_pin_lighthouse,
             "filebase": pull_pin_filebase,
         }
         return results
     
-    def test():
+    def test(self):
 
         return False
     

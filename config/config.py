@@ -20,15 +20,27 @@ class config():
             self.baseConfig = self.requireConfig(self.toml_file)
 
     def overrideToml(self, base, overrides):
-        for item in overrides.items():
-            key = item[0]
-            value = item[1]
-            if isinstance(value, dict):
-                base[key] = self.overrideToml(base[key], value)
+        if not isinstance(overrides, dict):
+            if isinstance(overrides, str):
+                if os.path.exists(overrides):
+                    with open(overrides) as f:
+                        for key, value in toml.load(f).items():
+                            base[key] = value
+                        return base
+                else:
+                    raise Exception('file not found: ' + overrides)
             else:
-                base[key] = value
-
-        return base
+                raise Exception('invalid override type: ' + str(type(overrides)))
+        elif isinstance(overrides, dict):
+            for item in overrides.items():
+                key = item[0]
+                value = item[1]
+                if isinstance(value, dict):
+                    base[key] = self.overrideToml(base[key], value)
+                else:
+                    base[key] = value
+        else:
+            return base
     
     def findConfig(self):
         paths = [
@@ -38,7 +50,7 @@ class config():
             './config/config.toml'
         ]
         foundPath = None
-        
+
         for path in paths:
             thisdir = os.getcwd() 
             this_path = os.path.realpath(os.path.join(thisdir, path))
