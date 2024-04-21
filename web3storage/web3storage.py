@@ -14,49 +14,77 @@ class web3storage():
         if meta is not None:
             if "api_key" in meta:
                 self.api_key = meta["api_key"]
-            elif "api_key" in list(self.keys()):
+            elif "api_key" in list(dir(self)):
                 self.api_key = self["api_key"]
             else:
                 self.api_key = None
                         
             if "config" in meta:
                 self.config = meta["config"]
-            elif "config" in list(self.keys()):
+            elif "config" in list(dir(self)):
                 self.config = self["config"]
             else :
-                self.config = config()
+                self.config = config.config("../config/config.toml")
             
             if "local_path" in meta:
                 self.local_path = meta["local_path"]
-            elif "local_path" in list(self.keys()):
+            elif "local_path" in list(dir(self)):
                 self.local_path = self["local_path"]    
             else:                
                 self.local_path = None
             
             if "w3cfg" in meta:
                 self.w3cfg = meta["w3cfg"]
-            elif "w3cfg" in list(self.keys()):
+            elif "w3cfg" in list(dir(self)):
                 self.w3cfg = self["w3cfg"]
             else:
-                self.w3cfg = subprocess.check_output("which w3cfg", shell=True)
+                self.w3cfg = subprocess.check_output("which w3", shell=True)
         else:
             meta = {}
             self.toml_file = "config.toml"
-            self.config = config()
+            this_config = config.config({"config" :"./config/config.toml"})
+            self.config = this_config
 
         self.state = None
-        self.ready()
 
     def ready(self):
+        self.w3 = None
         try:
-            self.w3cfg = subprocess.check_output("which w3cfg", shell=True).toString()
-        except:
+            w3 = subprocess.check_output("which w3", shell=True)
+            w3 = w3.decode("utf-8")
+            self.w3 = w3
+            #self.w3cfg = subprocess.check_output("which w3cfg", shell=True).toString()
+        except Exception as e:
+            print (e)
+            while "w3" not in list(dir(self)) or  self.w3 is None or int(self.w3) == 0 :
+                print("w3 not found")
+                ps_command = "ps -ef | grep w3 | grep install | grep -v grep | wc -l"
+                ps_result = subprocess.check_output(ps_command, shell=True) 
+                ps_result = ps_result.decode("utf-8")
+                if int(ps_result) == 0:
+                    install_command = "npm install -g @web3-storage/w3cli "
+                    print("Please install w3 by running the following command: " + install_command)
+                    os.system(install_command)
+                    ps_command = "ps -ef | grep w3 | grep install | grep -v grep | wc -l"
+                    ps_result = subprocess.check_output(ps_command, shell=True)
+                    ps_result = ps_result.decode("utf-8")
+                    self.w3 = ps_result
+                else:
+                    try:
+                        self.w3 = subprocess.check_output("which w3", shell=True)
+                        self.w3 = self.w3.decode("utf-8")
+                    except:
+                        self.w3 = None
+                    finally:
+                        pass
+
+            w3 = self.w3
             while "w3cfg" not in list(dir(self)) or  self.w3cfg is None or int(self.w3cfg) == 0 :
                 print("w3cfg not found")
                 ps_command = "ps -ef | grep w3cfg | grep install | grep -v grep | wc -l"
                 ps_result = subprocess.check_output(ps_command, shell=True) 
                 if int(ps_result) == 0:
-                    install_command = "npm install -g @web3api/w3cfg"
+                    install_command = "sudo npm install -g @web3-storage/w3cfg "
                     print("Please install w3cfg by running the following command: " + install_command)
                     os.system(install_command)
                     ps_command = "ps -ef | grep w3cfg | grep install | grep -v grep | wc -l"
@@ -70,18 +98,40 @@ class web3storage():
                     finally:
                         pass
 
-            w3cfg = self,w3cfg
-    
-        while int(self.w3cfg) == 0:
-            print("w3cfg not found")
-            install_command = "npm install -g @web3api/w3cfg"
-            print("Please install w3cfg by running the following command: " + install_command)
-            install_result = subprocess.check_output(install_command, shell=True)
-            print(install_result)
-            self.w3cfg = subprocess.check_output("which w3cfg", shell=True)
-            
-        command = "w3cfg login " + self.config.baseConfig["WEB3STORAGE"]["email"]
-        self.creds = subprocess.check_output(command, shell=True)
+            w3cfg = self.w3cfg
+
+            while "ipfs_car" not in list(dir(self)) or  self.ipfs_car is None or int(self.ipfs_car) == 0 :
+                print("ipfs-car not found")
+                ps_command = "ps -ef | grep ipfs-car | grep install | grep -v grep | wc -l"
+                ps_result = subprocess.check_output(ps_command, shell=True) 
+                if int(ps_result) == 0:
+                    install_command = "sudo npm install -g ipfs-car "
+                    print("Please install ipfs-car by running the following command: " + install_command)
+                    os.system(install_command)
+                    ps_command = "ps -ef | grep ipfs-car | grep install | grep -v grep | wc -l"
+                    ps_result = subprocess.check_output(ps_command, shell=True)
+                    
+                else:
+                    try:
+                        self.ipfs_car = subprocess.check_output("which ipfs-car", shell=True)
+                    except:
+                        self.ipfs_car = None
+                    finally:
+                        pass
+            ipfs_car = self.ipfs_car
+
+
+
+        command = "w3 login " + self.config.baseConfig["WEB3STORAGE"]["email"]
+        try:        
+            self.creds = subprocess.check_output(command, shell=True)
+        except Exception as e:
+            print(e)
+            print("Please login to web3.storage by running the following command: " + command)
+            os.system(command)
+            self.creds = subprocess.check_output(command, shell=True)
+        finally:
+            pass
         self.state = None
         web3storage_test_connection = self.web3storage_test_connection()
         return web3storage_test_connection
@@ -90,7 +140,7 @@ class web3storage():
     def web3storage_create(self, config, **kwargs):
         if "space_name" in kwargs:
             space_name = kwargs["space_name"]
-        elif "space_name" in list(self.keys()):
+        elif "space_name" in list(dir(self)):
             space_name = self["space_name"]
         elif "space_name" in self.config.baseConfig["WEB3STORAGE"]:
             space_name = self.config.baseConfig["WEB3STORAGE"]["space_name"]
@@ -106,12 +156,15 @@ class web3storage():
             results = subprocess.check_output(command, shell=True)
             with open("./config/config.toml", 'w') as f:
                 config_toml = f.read(results)
-        
-            config_toml = config_toml.replace("space_name", space_name) 
+                for line in config_toml:
+                    if "space_name" in line:
+                        replace_line = line
+                        config_toml = config_toml.replace(replace_line, "space_name="+space_name+"\n")
+                        
             with open("./config/config.toml", 'w') as f:
                 f.write(config_toml)
         
-            self.config = config()
+            self.config = config.config("../config/config.toml")
             self.config.baseConfig["WEB3STORAGE"]["space_name"] = space_name
             return self.config
 
@@ -133,26 +186,75 @@ class web3storage():
             print("Key: " + str(key))
             raise Exception("Missing required parameters")
 
-    def web3storage_test_connection(self, config, **kwargs):
+    def web3storage_test_connection(self, **kwargs):
         command = "w3 --version"
         results = subprocess.check_output(command, shell=True)
+        results = results.decode("utf-8")
+        print(results)
         self.web3storage_test_connection_results = results
         return results
     
-    def web3storage_test(self, config, **kwargs):
-        ready = self.ready(config, **kwargs)
+    def web3storage_test(self, **kwargs):
+        random_pin = ""
+        random_pin = "QmXBUkLywjKGTWNDMgxknk6FJEYu9fZaEepv3djmnEqEqD"
 
-        didKey = self.web3storage_create(space_name=self.config.baseConfig["WEB3STORAGE"]["space_name"])
-        authkey = self.web3storage_bridge(key=didKey)
+        test_connection = self.web3storage_test_connection(**kwargs)
+        if "did_key" in kwargs:
+            did_key = kwargs["did_key"]
+        elif "did_key" in list(dir(self)):
+            did_key = self["did_key"]
+        elif "did_key" in self.config.baseConfig["WEB3STORAGE"]:
+            did_key = self.config.baseConfig["WEB3STORAGE"]["did_key"]
+        else:
+            did_key = self.web3storage_create(space_name=self.config.baseConfig["WEB3STORAGE"]["space_name"])
+            with open("./config/config.toml", 'r') as f:
+                config_toml = f.read()
+                for line in config_toml:
+                    if "did_key" in line:
+                        replace_line = line
+                        config_toml = config_toml.replace(replace_line, "did_key="+did_key+"\n")
+                        break
+            with open("./config/config.toml", 'w') as f:
+                f.write(config_toml)
 
-        if didKey is not None and authkey is not None:
-            web3storage_request = self.web3storage_request(didKey, authkey)
+        if "auth_key" in kwargs:
+            auth_key = kwargs["auth_key"]
+        elif "auth_key" in list(dir(self)):
+            auth_key = self["auth_key"]
+        elif "auth_key" in self.config.baseConfig["WEB3STORAGE"]:
+            auth_key = self.config.baseConfig["WEB3STORAGE"]["auth_key"]
+        else:
+            try:
+                auth_key = self.web3storage_bridge(key=did_key)
+                with open("./config/config.toml", 'r') as f:
+                    config_toml = f.read()
+                    for line in config_toml:
+                        if "auth_key" in line:
+                            replace_line = line
+                            config_toml = config_toml.replace(replace_line, "auth_key="+auth_key+"\n")
+                            break
+                with open("./config/config.toml", 'w') as f:
+                    f.write(config_toml)
+            except Exception as e:
+                print(e)
+                print("web3storage_test")
+                print("Missing required parameters")
+                print("DID Key: " + str(did_key))
+                print("Auth Key: " + str(auth_key))
+                raise Exception("Missing required parameters")
+                return False
+
+        if did_key is not None and auth_key is not None:
+            web3storage_request = self.web3storage_request( random_pin,
+                                                            did_kay =  did_key,
+                                                            auth_key = auth_key
+                                                        )
             return True
         else:
             print("web3storage_test")
             print("Missing required parameters")
-            print("DID Key: " + str(didKey))
-            print("Auth Key: " + str(authkey))
+            print("DID Key: " + str(did_key))
+            print("Auth Key: " + str(auth_key))
             raise Exception("Missing required parameters")
             return False
 
@@ -203,8 +305,66 @@ class web3storage():
             print("Auth Key: " + str(auth_key))
             raise Exception("Missing required parameters")
 
+    def web3storage_can_add(self, pin, **kwargs):
+        if "path" in kwargs:
+            path = kwargs["path"]
+
+        command = f"""ipfs dag"""      
+
 
     def web3storage_push(self, pin, **kwargs):
+        try:
+            command = "ipfs dag export " + pin + " > " + pin + ".car"
+            results = subprocess.check_output(command, shell=True)
+            results_car_file = results.decode("utf-8")
+            print(results_car_file)
+        except Exception as e:
+            print(e)
+            print("web3storage_push")
+            print("Missing required parameters")
+            print("Pin: " + str(pin))
+            raise Exception("Missing required parameters")
+            return False
+        finally:
+            pass
+
+        try:
+            command = "w3 can store add " + car_file
+            results = subprocess.check_output(command, shell=True)
+            results_store_add = results.decode("utf-8")
+            print(results_store_add)
+        except Exception as e:
+            print(e)
+            print("web3storage_push")
+            print("Missing required parameters")
+            print("Pin: " + str(pin))
+            raise Exception("Missing required parameters")
+            return False
+        finally:
+            pass
+
+        try:
+            command = "w3 upload add " + car_file
+            results = subprocess.check_output(command, shell=True)
+            results_upload_add = results.decode("utf-8")
+            print(results_upload_add)
+        except Exception as e:
+            print(e)
+            print("web3storage_push")
+            print("Missing required parameters")
+            print("Pin: " + str(pin))
+            raise Exception("Missing required parameters")
+            return False
+        finally:
+            pass
+
+        results = {
+            "car_file": results_car_file,
+            "store_add": results_store_add,
+            "upload_add": results_upload_add
+        }
+
+        return results
         return False
         config = self.config
         auth_key = self.config.baseConfig["WEB3STORAGE"]["auth_key"]
@@ -251,6 +411,7 @@ class web3storage():
             print("Auth Key: " + str(auth_key))
             raise Exception("Missing required parameters")
         
+
 
     def web3storage_push_bak(self, pin, **kwargs):
         config = self.config
@@ -371,3 +532,16 @@ class web3storage():
         state["remaining"] = state["quota"] - state["usage"]
         
         return state    
+
+if __name__ == '__main__':
+    test_web3storage = web3storage()
+    test_web3storage.ready()
+    test_web3storage.web3storage_test()
+    test_web3storage.web3storage_state()
+    test_web3storage.web3storage_create(
+        "test",
+        space_name = "test"
+        )
+    test_web3storage.web3storage_bridge("test")
+    test_web3storage.web3storage_request("test", "pin")
+

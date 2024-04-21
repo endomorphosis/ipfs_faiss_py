@@ -3,6 +3,7 @@ from pinata import pinata
 from web3storage import web3storage
 from filebase import filebase
 from lighthouse import lighthouse
+from config import config
 
 import urllib3
 import requests
@@ -91,7 +92,9 @@ def test():
     files_by_folder = filterFileByFolderPins(folder_names, file_pins)
     all_pins = []
     push_results = {}
-    this_pinning_apis = PinningApis()
+    meta = {}
+    meta['config'] = config("./config/config.toml")
+    this_pinning_apis = PinningApis(None, meta)
     for pin_list in pin_chunks:
         for pin in pin_list:
             pin_cid = None

@@ -20,11 +20,16 @@ class PinningApis():
         self.config = config()
         self.api_key = None
         self.local_path = None
+        if not isinstance(meta, dict):
+            meta = {}
+        if "config" not in meta:
+            meta.config = config.config("./config/config.toml")
+            pass
 
-        self.lighthouse = lighthouse()
-        self.web3storage = web3storage()
-        self.filebase = filebase()
-        self.pinata = pinata()
+        self.lighthouse = lighthouse(collection, meta)
+        self.web3storage = web3storage(collection, meta)
+        self.filebase = filebase(collection, meta)
+        self.pinata = pinata(collection, meta)
 
         self.pinata_quota = None
         self.web3storage_quota = None
