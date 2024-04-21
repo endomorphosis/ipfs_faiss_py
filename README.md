@@ -2,15 +2,15 @@
 IPFS Huggingface Bridge:
 
 for huggingface datasets python library visit:
-https://github.com/endomorphosis/ipfs_datasets
+https://github.com/endomorphosis/ipfs_datasets/
 
-for huggingface transformers python library visit:
-https://github.com/endomorphosis/ipfs_transformers
+for transformers python library visit:
+https://github.com/endomorphosis/ipfs_transformers/
 
-for transformers.js visit:                          
-https://github.com/endomorphosis/ipfs_transformers_js
+for transformers js client visit:                          
+https://github.com/endomorphosis/ipfs_transformers_js/
 
-for orbitdb_kit nodejs library visit:
+for orbitdbkit nodejs library visit:
 https://github.com/endomorphosis/orbitdb_kit/
 
 for python model manager library visit: 
