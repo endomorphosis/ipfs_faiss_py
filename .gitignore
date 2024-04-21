@@ -6,3 +6,4 @@ package-lock.json
 **/package-lock.json
 **/ipfs_faiss.egg-info
 **/build
+config.toml

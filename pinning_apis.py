@@ -1,4 +1,10 @@
-from .config import config
+import os
+import sys
+import json
+import requests
+sys.path.append('./config')
+sys.path.append('..')
+from config import config
 
 class PinningApis():
     def __init__(self, collection=None, meta=None):
