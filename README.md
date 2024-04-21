@@ -121,3 +121,15 @@ query_vector = model.encode(query)
 scores, neighbors = index.search(query_vectors, k=10)
 
 ~~~
+
+or to use this pin syncer notice the pins located in pin_store
+
+~~~shell
+
+python3 upload_pins.py
+
+~~~
+
+will upload them to web3storage, pinata, filebase, and lighthouse storage
+and there will instear be a web3storage_pins.tsv file with the new pins to import into huggingface datasets
+... but only web3stoage is working right now.
