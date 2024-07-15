@@ -1,30 +1,4 @@
 # Scaling Ethereum Hackathon Presents
-IPFS Huggingface Bridge:
-
-for huggingface datasets python library visit:
-https://github.com/endomorphosis/ipfs_datasets/
-
-for transformers python library visit:
-https://github.com/endomorphosis/ipfs_transformers/
-
-for transformers js client visit:                          
-https://github.com/endomorphosis/ipfs_transformers_js/
-
-for orbitdbkit nodejs library visit:
-https://github.com/endomorphosis/orbitdb_kit/
-
-for python model manager library visit: 
-https://github.com/endomorphosis/ipfs_model_manager/
-
-for nodejs model manager library visit: 
-https://github.com/endomorphosis/ipfs_model_manager_js/
-
-for nodejs ipfs huggingface scraper with pinning services visit:
-https://github.com/endomorphosis/ipfs_huggingface_scraper/
-
-
-Author - Benjamin Barber
-QA - Kevin De Haan
 
 # About
 
@@ -136,3 +110,32 @@ will upload them to web3storage, pinata, filebase, and lighthouse storage
 and there will instear be a web3storage_pins.tsv file with the new pins to import into datasets
 ... but only web3stoage is working right now.
 
+# IPFS Huggingface Bridge:
+
+for huggingface datasets python library visit:
+https://github.com/endomorphosis/ipfs_datasets/
+
+for transformers python library visit:
+https://github.com/endomorphosis/ipfs_transformers/
+
+for transformers js client visit:                          
+https://github.com/endomorphosis/ipfs_transformers_js/
+
+for orbitdbkit nodejs library visit:
+https://github.com/endomorphosis/orbitdb_kit/
+
+for fireproof_kit nodejs library visit:
+https://github.com/endomorphosis/fireproof_kit
+
+for python model manager library visit: 
+https://github.com/endomorphosis/ipfs_model_manager/
+
+for nodejs model manager library visit: 
+https://github.com/endomorphosis/ipfs_model_manager_js/
+
+for nodejs ipfs huggingface scraper with pinning services visit:
+https://github.com/endomorphosis/ipfs_huggingface_scraper/
+
+
+Author - Benjamin Barber
+QA - Kevin De Haan
