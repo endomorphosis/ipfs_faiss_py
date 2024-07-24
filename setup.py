@@ -5,10 +5,6 @@ setup(
 	version='0.0.1',
 	packages=[
 		'ipfs_faiss',
-        'ipfs_faiss.model_manager',
-        'ipfs_faiss.model_manager.ipfs_kit_lib',
-		'ipfs_faiss.model_manager.orbitdb_kit_lib',
-        'ipfs_faiss.model_manager.ipfs_datasets_lib',
 	],
 	install_requires=[
         'ipfs_datasets@git+https://github.com/endomorphosis/ipfs_datasets.git',
