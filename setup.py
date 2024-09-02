@@ -4,7 +4,7 @@ setup(
 	name='ipfs-faiss_py',
 	version='0.0.2',
 	packages=[
-		'ipfs_faiss',
+		'ipfs_faiss_py',
 	],
 	install_requires=[
         'ipfs_datasets_py',
