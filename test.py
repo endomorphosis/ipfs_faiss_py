@@ -1,13 +1,13 @@
 import datasets
 from datasets import load_dataset
 # from transformers import AutoModel
-# from ipfs_transformers import AutoModel
-# from ipfs_datasets import ipfs_load_dataset
-# from ipfs_datasets import auto_download_dataset
-from ipfs_faiss import IpfsFaissDataset
+# from ipfs_transformers_py import AutoModel
+# from ipfs_datasets_py import ipfs_load_dataset
+# from ipfs_datasets_py import auto_download_dataset
+from ipfs_faiss_py import IpfsFaissDataset
 from datasets import *
-from ipfs_faiss import *
-from ipfs_faiss import IpfsFaissDataset
+from ipfs_faiss_py import *
+from ipfs_faiss_py import IpfsFaissDataset
 import datasets
 import urllib3
 import requests

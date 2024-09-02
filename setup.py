@@ -1,17 +1,17 @@
 from setuptools import setup
 
 setup(
-	name='ipfs-faiss',
+	name='ipfs-faiss_py',
 	version='0.0.2',
 	packages=[
 		'ipfs_faiss',
 	],
 	install_requires=[
-        'ipfs_datasets@git+https://github.com/endomorphosis/ipfs_datasets.git',
+        'ipfs_datasets_py',
 		'datasets',
-        "ipfs_model_manager@git+https://github.com/endomorphosis/ipfs_model_manager.git",
-        "orbitdb_kit@git@git+https://github.com/endomorphosis/orbitdb_kit.git",
-		"ipfs_kit@git+https://github.com/endomorphosis/ipfs_kit.git",
+        "ipfs_model_manager_py",
+        "orbitdb_kit_py",
+		"ipfs_kit_py",
 		"faiss",
 		'urllib3',
 		'requests',
