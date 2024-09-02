@@ -3,8 +3,8 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ipfs_faiss"
-version = "0.0.2"
+name = "ipfs_faiss_py"
+version = "0.0.3"
 authors = [
   { name="Benjamin Barber", email="starworks5@gmail.com" },
 ]
@@ -17,5 +17,5 @@ classifiers = [
     "Operating System :: POSIX :: Linux",
 ]
 [project.urls]
-Homepage = "https://github.com/endomorphosis/ipfs_faiss"
-Issues = "https://github.com/endomorphosis/ipfs_faiss/issues"
+Homepage = "https://github.com/endomorphosis/ipfs_faiss_py"
+Issues = "https://github.com/endomorphosis/ipfs_faiss_py/issues"
