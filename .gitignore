@@ -8,3 +8,4 @@ package-lock.json
 **/build
 config.toml
 dist/
+*.egg-info
