@@ -2,7 +2,7 @@ import datasets
 import ipfs_datasets_py
 import os 
 
-class IpfsFaissDataset():
+class ipfs_faiss_dataset():
     def __init__(self, collection=None, meta=None):
         self.ipfs_faiss = []
         if meta is None:
@@ -70,10 +70,10 @@ class IpfsFaissDataset():
                     "s3_cfg": self.s3cfg,
                     "role": self.role
 				}
-        from ipfs_datasets.model_manager import model_manager as model_manager
-        self.model_manager = model_manager(collection, meta)
-        self.model_manager.load_collection_cache()
-        self.model_manager.state()
+        # from ipfs_datasets_py.model_manager import model_manager as model_manager
+        # self.model_manager = model_manager(collection, meta)
+        # self.model_manager.load_collection_cache()
+        # self.model_manager.state()
 				
     def download(self, **kwargs):
 		# NOTE: Add kwarg for output directory where downloads are stored
