@@ -1,5 +1,5 @@
 import datasets
-import ipfs_datasets
+import ipfs_datasets_py
 import os 
 
 class IpfsFaissDataset():
