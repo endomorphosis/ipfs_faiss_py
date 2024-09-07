@@ -12,9 +12,11 @@ class test_ipfs_faiss:
         return None
     
     def test_ipfs_faiss(self, dataset, faiss_index, elastic_index, join_column):
-        self.dataset = datasets.load_dataset("")
-        self.faiss_index = datasets.load_faiss_index()
+        self.dataset = datasets.load_dataset("laion/Wikipedia-X")
+        self.faiss_index = datasets.load_faiss_index("laion/Wikipedia-M3")
+        print(self.faiss_index.columns)
         self.elastic_index = datasets.load_elastic_index()
+        self.faiss_index.get_nearest_examples
         return None
     
 if __name__ == "__main__":
