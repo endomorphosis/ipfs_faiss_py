@@ -24,9 +24,12 @@ class test_ipfs_faiss:
         self.ipfs_embeddings_py.add_https_endpoint("BAAI/bge-m3", "62.146.168.111:8081/embed",1)
         if test_query is not None:
             self.test_query = [test_query]
-            self.ipfs_embeddings_py.queue_index_knn(self.test_query)
-            print(list(self.ipfs_embeddings_py.knn_queue))
-        
+            self.ipfs_embeddings_py.queue_index_knn([test_query])
+
+        selected_endpoint = self.ipfs_embeddings_py.choose_endpoint()
+        print(selected_endpoint)
+        if (len(self.ipfs_embeddings_py.cid_queue) > 0):
+            items_to_index = self.ipfs_embeddings_py.pop_index_knn(1)
         self.dataset = datasets.load_dataset(dataset)
         print(self.dataset)
         self.faiss_index = datasets.load_dataset(faiss_index)
